@@ -1,16 +1,19 @@
 # Laravel Project Installer
 
-This repository contains scripts to set up and manage Laravel projects with proper configurations and permissions. The scripts are designed to work correctly with both regular and sudo execution.
+This repository contains scripts to set up, build, and manage Laravel projects with proper configurations and permissions. The scripts handle common issues like permission problems, npm conflicts, and provide clear error messages.
 
 ## Features
 
 - Automatic installation and build process
 - Safe sudo execution handling
 - Proper user permissions management
-- Node.js installation via nvm
+- Flexible project path handling
+- Clear error messages and troubleshooting
+- Node.js/npm permission fixes
 - SQLite database configuration
 - Production optimizations
-- Custom port support
+- Executable permission management
+- Multiple execution options
 
 ## Requirements
 
@@ -104,26 +107,70 @@ chmod +x build.sh permissions.py
 
 2. Run the build script:
 ```bash
-# Option 1: Run from the Laravel project directory
+# Option 1: From the Laravel project directory
 cd /your/laravel/project
 sudo ./build.sh
 
-# Option 2: Specify the Laravel project path as an argument
-sudo ./build.sh /path/to/your/laravel/project
+# Option 2: From the installer directory
+sudo ./build.sh /path/to/laravel/project
+
+# Option 3: Using full paths
+sudo /path/to/build.sh /path/to/laravel/project
+
+# Example:
+# If your Laravel project is in a subdirectory of the installer
+sudo ./build.sh my-laravel-app
 ```
+
+The build script will:
+- Install PHP dependencies with correct permissions
+- Set up the environment file if needed
+- Install Node.js dependencies
+- Ensure proper executable permissions
+- Build frontend assets
 
 3. Set proper permissions:
 ```bash
 sudo python3 permissions.py /your/laravel/project
 ```
 
-### Common Issues
+### Troubleshooting
 
-1. **Sudo Permission Issues**: The scripts handle sudo execution correctly, maintaining proper file ownership and permissions.
+1. **Wrong Directory Error**
+```
+[!] Not a Laravel project directory: /path/to/directory
+```
+Solution: Make sure you're pointing to the correct Laravel project directory. If using the installer directory, specify the Laravel project subdirectory:
+```bash
+sudo ./build.sh my-laravel-app
+```
 
-2. **Node.js/npm Issues**: The build script uses nvm (Node Version Manager) to avoid package conflicts.
+2. **Permission Denied for npm/vite**
+```
+sh: 1: vite: Permission denied
+```
+Solution: The script will automatically fix this by making node_modules/.bin executables accessible. If you still see this error, run:
+```bash
+sudo chmod +x /path/to/project/node_modules/.bin/*
+```
 
-3. **File Permission Problems**: Run the permissions.py script after setup to ensure correct permissions.
+3. **Composer Root Warning**
+```
+Do not run Composer as root/super user!
+```
+Solution: This is a warning, not an error. The script handles permissions correctly, so you can safely continue.
+
+4. **Node.js/npm Issues**
+The build script handles npm installations with correct permissions. If you see any npm errors:
+- Make sure Node.js is installed
+- Try clearing npm cache: `npm cache clean --force`
+- Remove node_modules and try again: `rm -rf node_modules`
+
+5. **File Permission Problems**
+After building, if you see permission issues in your web server logs:
+```bash
+sudo python3 permissions.py /path/to/laravel/project
+```
 
 ## Development
 
@@ -131,22 +178,55 @@ The project uses SQLite for the database, which is stored in `database/database.
 
 ## Production Deployment
 
-Before deploying to production:
-
-1. Run the build script:
+### Option 1: Standard Build
 ```bash
 ./build.sh
 ```
 
-2. Set proper permissions:
+### Option 2: Nginx Production Build
+For nginx deployment, use the specialized build script:
+
+```bash
+# Copy build script to your Laravel project
+cp build-for-nginx.sh /path/to/your/laravel/project/
+
+# Run from your Laravel project directory
+cd /path/to/your/laravel/project
+./build-for-nginx.sh
+```
+
+The nginx build script will:
+- Install production PHP dependencies only
+- Install and compile frontend assets
+- Generate application key if needed
+- Optimize Laravel for production
+- Cache configurations, routes, and views
+
+### Post-Build Steps
+
+1. Set proper permissions:
 ```bash
 sudo python3 permissions.py /path/to/your/project
 ```
 
-3. Update `.env` file with production settings:
+2. Update `.env` file with production settings:
    - Set `APP_ENV=production`
    - Set `APP_DEBUG=false`
    - Configure database settings
    - Set application URL
 
-4. Configure your web server to point to the `public` directory
+3. Configure nginx:
+   - Point root to the `public` directory
+   - Example path: `/usr/share/nginx/your-app/public`
+
+### Verifying the Build
+
+Check compiled assets in `public/build/`:
+```bash
+ls -l public/build/assets/
+```
+
+You should see:
+- Compiled CSS (*.css)
+- Compiled JavaScript (*.js)
+- Asset manifest (manifest.json)
