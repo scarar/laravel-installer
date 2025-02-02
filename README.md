@@ -1,23 +1,103 @@
-# Laravel Project Installer
+# Laravel Project Setup Guide
 
-This repository contains scripts to set up, build, and manage Laravel projects with proper configurations and permissions. The scripts handle common issues like permission problems, npm conflicts, and provide clear error messages.
+A simple, tested guide for setting up Laravel projects with nginx. This repository serves as a reference implementation and will be used as the base for our blog project.
 
-## Features
+## Simple Installation Steps
 
-- Automatic installation and build process
-- Safe sudo execution handling
-- Proper user permissions management
-- Flexible project path handling
-- Clear error messages and troubleshooting
-- Node.js/npm permission fixes
-- SQLite database configuration
-- Production optimizations
-- Executable permission management
-- Multiple execution options
+1. **Create Laravel Project**:
+```bash
+cd /usr/share/nginx/laravel-test
+composer create-project laravel/laravel my-app
+```
+
+2. **Install & Build Frontend**:
+```bash
+cd my-app
+npm install
+npm run build
+```
+
+3. **Set Permissions**:
+```bash
+sudo chown -R www-data:www-data .
+sudo chmod -R 755 .
+sudo chmod -R 775 storage bootstrap/cache
+```
+
+## Verification
+
+Check compiled assets:
+```bash
+ls -l public/build/assets/
+```
+
+You should see:
+- app-*.css
+- app-*.js
+- manifest.json in public/build/
 
 ## Requirements
 
 - Debian/Ubuntu-based system
+- PHP 8.2 or higher
+- Composer
+- Node.js and npm
+- Nginx
+
+## Next Steps: Blog Development
+
+The blog development will be done in a separate branch. We'll be adding:
+
+1. **Authentication System**
+   - User registration
+   - Login/logout
+   - Password reset
+
+2. **Blog Features**
+   - Post creation and management
+   - Categories and tags
+   - Comments system
+   - Rich text editor
+
+3. **Admin Panel**
+   - User management
+   - Content moderation
+   - Analytics dashboard
+
+To start working on the blog:
+```bash
+# Clone this repository
+git clone <repository-url>
+
+# Create and switch to blog development branch
+git checkout -b blog-dev
+
+# Follow installation steps above
+cd /usr/share/nginx/laravel-test
+composer create-project laravel/laravel my-app
+```
+
+## Common Issues
+
+1. **Permission Denied**
+```bash
+# If you see permission errors in storage or cache
+sudo chmod -R 775 storage bootstrap/cache
+sudo chown -R www-data:www-data .
+```
+
+2. **Assets Not Found**
+```bash
+# Rebuild assets
+npm install
+npm run build
+```
+
+3. **Nginx Configuration**
+Make sure your nginx points to the public directory:
+```nginx
+root /usr/share/nginx/laravel-test/my-app/public;
+```
 - Python 3.x
 - Sudo privileges
 
