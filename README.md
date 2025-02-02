@@ -102,10 +102,14 @@ cp /path/to/build.sh /path/to/permissions.py /your/laravel/project/
 chmod +x build.sh permissions.py
 ```
 
-2. Run the build script from your project root:
+2. Run the build script:
 ```bash
+# Option 1: Run from the Laravel project directory
 cd /your/laravel/project
-sudo ./build.sh  # or without sudo if not needed
+sudo ./build.sh
+
+# Option 2: Specify the Laravel project path as an argument
+sudo ./build.sh /path/to/your/laravel/project
 ```
 
 3. Set proper permissions:
