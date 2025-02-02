@@ -1,20 +1,72 @@
 # Laravel Project Installer
 
-This repository contains a script to automatically set up a Laravel project with SQLite database configuration.
+This repository contains scripts to set up and manage Laravel projects with proper configurations and permissions.
 
 ## Features
 
-- Automatic installation of all required dependencies
+- Automatic installation and build process
 - SQLite database configuration
 - Node.js dependencies and asset compilation
 - Production optimizations
+- Proper permissions management
 - Custom port support
 - Interactive server startup
 
 ## Requirements
 
 - Debian/Ubuntu-based system
+- Python 3.x
 - Sudo privileges
+
+## Scripts
+
+### 1. Build Script (build.sh)
+
+After cloning your Laravel project, use this script to set up everything:
+
+```bash
+./build.sh
+```
+
+This script:
+- Installs PHP dependencies
+- Sets up the environment file
+- Generates application key
+- Installs Node.js dependencies
+- Builds frontend assets
+
+### 2. Permissions Script (permissions.py)
+
+Manages Laravel directory and file permissions:
+
+```bash
+sudo python3 permissions.py /path/to/your/laravel/project
+```
+
+This script sets:
+- Standard directories to 755
+- Writable directories to 775
+- Files to 644
+- Artisan as executable (755)
+
+#### Managed Directories
+
+Standard (755):
+- app
+- bootstrap
+- config
+- database
+- public
+- resources
+- routes
+- tests
+
+Writable (775):
+- storage/app
+- storage/app/public
+- storage/framework/*
+- storage/logs
+- bootstrap/cache
 
 ## Installation
 
@@ -24,44 +76,19 @@ git clone <repository-url>
 cd <repository-name>
 ```
 
-2. Make the installation script executable:
+2. Make scripts executable:
 ```bash
-chmod +x install_laravel.sh
+chmod +x build.sh permissions.py
 ```
 
-3. Run the installation script:
+3. Run the build script:
 ```bash
-# Basic usage (default port: 51400)
-./install_laravel.sh myproject
-
-# With custom port
-./install_laravel.sh myproject 8000
+./build.sh
 ```
 
-## What the Script Does
-
-1. Installs system dependencies:
-   - PHP 8.2 and required extensions
-   - Composer (PHP package manager)
-   - Node.js and npm
-
-2. Creates a new Laravel project with:
-   - SQLite database configuration
-   - Node.js dependencies
-   - Built frontend assets
-   - Production optimizations
-
-3. Creates a convenient start script
-
-## Starting the Server
-
-After installation, you can start the server:
-
+4. Set proper permissions:
 ```bash
-cd myproject
-./start.sh          # Uses default port (51400)
-# or
-./start.sh 8000     # Uses custom port
+sudo python3 permissions.py /path/to/your/laravel/project
 ```
 
 ## Development
@@ -72,11 +99,20 @@ The project uses SQLite for the database, which is stored in `database/database.
 
 Before deploying to production:
 
-1. Review and update `.env` file with production settings
-2. Set `APP_ENV=production` and `APP_DEBUG=false`
-3. Generate a new application key if needed:
-   ```bash
-   php artisan key:generate
-   ```
-4. Ensure proper file permissions
-5. Configure your web server to point to the `public` directory
+1. Run the build script:
+```bash
+./build.sh
+```
+
+2. Set proper permissions:
+```bash
+sudo python3 permissions.py /path/to/your/project
+```
+
+3. Update `.env` file with production settings:
+   - Set `APP_ENV=production`
+   - Set `APP_DEBUG=false`
+   - Configure database settings
+   - Set application URL
+
+4. Configure your web server to point to the `public` directory
