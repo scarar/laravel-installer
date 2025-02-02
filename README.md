@@ -1,16 +1,16 @@
 # Laravel Project Installer
 
-This repository contains scripts to set up and manage Laravel projects with proper configurations and permissions.
+This repository contains scripts to set up and manage Laravel projects with proper configurations and permissions. The scripts are designed to work correctly with both regular and sudo execution.
 
 ## Features
 
 - Automatic installation and build process
+- Safe sudo execution handling
+- Proper user permissions management
+- Node.js installation via nvm
 - SQLite database configuration
-- Node.js dependencies and asset compilation
 - Production optimizations
-- Proper permissions management
 - Custom port support
-- Interactive server startup
 
 ## Requirements
 
@@ -22,18 +22,24 @@ This repository contains scripts to set up and manage Laravel projects with prop
 
 ### 1. Build Script (build.sh)
 
-After cloning your Laravel project, use this script to set up everything:
+This script sets up an existing Laravel project. Run it from your Laravel project root:
 
 ```bash
+# If running as regular user
 ./build.sh
+
+# If running as sudo (maintains correct permissions)
+sudo ./build.sh
 ```
 
-This script:
-- Installs PHP dependencies
+The script:
+- Verifies Laravel project structure
+- Installs PHP dependencies with correct user
 - Sets up the environment file
 - Generates application key
-- Installs Node.js dependencies
+- Installs Node.js dependencies via nvm
 - Builds frontend assets
+- Maintains proper file ownership
 
 ### 2. Permissions Script (permissions.py)
 
@@ -68,7 +74,9 @@ Writable (775):
 - storage/logs
 - bootstrap/cache
 
-## Installation
+## Installation and Usage
+
+### For a New Laravel Project
 
 1. Clone this repository:
 ```bash
@@ -78,18 +86,40 @@ cd <repository-name>
 
 2. Make scripts executable:
 ```bash
+chmod +x install_laravel.sh build.sh permissions.py
+```
+
+3. Create a new Laravel project:
+```bash
+./install_laravel.sh myproject
+```
+
+### For an Existing Laravel Project
+
+1. Copy the scripts to your Laravel project:
+```bash
+cp /path/to/build.sh /path/to/permissions.py /your/laravel/project/
 chmod +x build.sh permissions.py
 ```
 
-3. Run the build script:
+2. Run the build script from your project root:
 ```bash
-./build.sh
+cd /your/laravel/project
+sudo ./build.sh  # or without sudo if not needed
 ```
 
-4. Set proper permissions:
+3. Set proper permissions:
 ```bash
-sudo python3 permissions.py /path/to/your/laravel/project
+sudo python3 permissions.py /your/laravel/project
 ```
+
+### Common Issues
+
+1. **Sudo Permission Issues**: The scripts handle sudo execution correctly, maintaining proper file ownership and permissions.
+
+2. **Node.js/npm Issues**: The build script uses nvm (Node Version Manager) to avoid package conflicts.
+
+3. **File Permission Problems**: Run the permissions.py script after setup to ensure correct permissions.
 
 ## Development
 
