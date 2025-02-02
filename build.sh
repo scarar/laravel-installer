@@ -87,6 +87,10 @@ fi
 # Build frontend assets
 print_status "Building frontend assets..."
 if [ -f "package.json" ]; then
+    # Ensure node_modules/.bin is executable
+    if [ -d "node_modules/.bin" ]; then
+        run_as_user chmod +x node_modules/.bin/*
+    fi
     run_as_user npm run build
 else
     print_error "package.json not found"
