@@ -178,22 +178,55 @@ The project uses SQLite for the database, which is stored in `database/database.
 
 ## Production Deployment
 
-Before deploying to production:
-
-1. Run the build script:
+### Option 1: Standard Build
 ```bash
 ./build.sh
 ```
 
-2. Set proper permissions:
+### Option 2: Nginx Production Build
+For nginx deployment, use the specialized build script:
+
+```bash
+# Copy build script to your Laravel project
+cp build-for-nginx.sh /path/to/your/laravel/project/
+
+# Run from your Laravel project directory
+cd /path/to/your/laravel/project
+./build-for-nginx.sh
+```
+
+The nginx build script will:
+- Install production PHP dependencies only
+- Install and compile frontend assets
+- Generate application key if needed
+- Optimize Laravel for production
+- Cache configurations, routes, and views
+
+### Post-Build Steps
+
+1. Set proper permissions:
 ```bash
 sudo python3 permissions.py /path/to/your/project
 ```
 
-3. Update `.env` file with production settings:
+2. Update `.env` file with production settings:
    - Set `APP_ENV=production`
    - Set `APP_DEBUG=false`
    - Configure database settings
    - Set application URL
 
-4. Configure your web server to point to the `public` directory
+3. Configure nginx:
+   - Point root to the `public` directory
+   - Example path: `/usr/share/nginx/your-app/public`
+
+### Verifying the Build
+
+Check compiled assets in `public/build/`:
+```bash
+ls -l public/build/assets/
+```
+
+You should see:
+- Compiled CSS (*.css)
+- Compiled JavaScript (*.js)
+- Asset manifest (manifest.json)
