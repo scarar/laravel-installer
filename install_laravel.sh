@@ -3,6 +3,13 @@
 # Exit on error
 set -e
 
+# Get the real user's home directory when running with sudo
+if [ -n "$SUDO_USER" ]; then
+    REAL_HOME=$(getent passwd "$SUDO_USER" | cut -d: -f6)
+else
+    REAL_HOME=$HOME
+fi
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -37,10 +44,42 @@ PROJECT_PATH="/workspace/$PROJECT_NAME"
 
 # Install system dependencies
 print_status "Installing system dependencies..."
+# Install PHP and extensions
 sudo apt update
 sudo apt install -y php8.2 php8.2-cli php8.2-common php8.2-sqlite3 php8.2-zip \
-    php8.2-gd php8.2-mbstring php8.2-curl php8.2-xml php8.2-bcmath \
-    unzip nodejs npm
+    php8.2-gd php8.2-mbstring php8.2-curl php8.2-xml php8.2-bcmath unzip
+
+# Install nvm (Node Version Manager)
+if [ ! -d "$REAL_HOME/.nvm" ]; then
+    print_status "Installing nvm..."
+    if [ -n "$SUDO_USER" ]; then
+        sudo -u "$SUDO_USER" bash -c "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash"
+    else
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+    fi
+    export NVM_DIR="$REAL_HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+fi
+
+# Load nvm if it exists
+if [ -f "$REAL_HOME/.nvm/nvm.sh" ]; then
+    export NVM_DIR="$REAL_HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+else
+    print_error "nvm installation failed"
+    exit 1
+fi
+
+# Install Node.js LTS version
+print_status "Installing Node.js LTS version..."
+nvm install --lts
+nvm use --lts
+
+# Verify installations
+print_status "Verifying installations..."
+php --version
+node --version
+npm --version
 
 # Install Composer if not installed
 if ! command -v composer &> /dev/null; then
